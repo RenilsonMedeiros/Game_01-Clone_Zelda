@@ -24,30 +24,31 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	public static JFrame frame;
 	private Thread thread;
 	private Boolean isRunning = true;
-	private final int WIDTH = 240;
-	private final int HEIGHT = 160;
+	public static final int WIDTH = 240;
+	public static final int HEIGHT = 160;
 	private final int SCALE = 3;
 
 	private BufferedImage image;
 	
-	public List<Entity> entities;
+	public static List<Entity> entities;
 	public static Spritesheet spritesheet;
 	
 	public static World world;
 	
-	private Player player;
+	public static Player player;
 
 	public Game() {
 		addKeyListener(this);
 		setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
 		initFrame();
 		//Inicializando objetos.
-		world = new World("/map.png");
+		
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		entities = new ArrayList<Entity>();
 		spritesheet = new Spritesheet("/spritesheet.png");
-		player = new Player(0, 0, 16, 16, spritesheet.getSprite(32, 0, 16, 16));
+		player = new Player(0, 0, 16, 16, spritesheet.getSprite(32, 0, 16, 16));		
 		entities.add(player);
+		world = new World("/map.png");
 		
 	}
 
@@ -95,11 +96,13 @@ public class Game extends Canvas implements Runnable, KeyListener {
 			return;
 		}
 		Graphics g = image.getGraphics();
-		g.setColor(new Color(0,255,0));
+		g.setColor(new Color(0,0,0));
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
 		/* Renderização do jogo */
 		//Graphics2D g2 = (Graphics2D) g;
+		world.render(g);
+		
 		for(int i = 0; i < entities.size(); i++) {
 			Entity e = entities.get(i);
 			e.render(g);
