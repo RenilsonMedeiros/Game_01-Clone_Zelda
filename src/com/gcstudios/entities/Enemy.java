@@ -26,19 +26,25 @@ public class Enemy extends Entity {
 	
 	public void tick() {
 		//maskx = 8; masky = 8; maskw = 8; maskh = 8;
-		if((int)x < Game.player.getX() && World.isFree((int)(x+speed), this.getY())
-				&& !isColidding((int)(x+speed), this.getY())) {
-			x+=speed;
-		} else if((int)x > Game.player.getX() && World.isFree((int)(x-speed), this.getY())
-				&& !isColidding((int)(x-speed), this.getY())) {
-			x-=speed;
-		}
-		if((int)y < Game.player.getY() && World.isFree(this.getX(), (int)(y+speed))
-				&& !isColidding(this.getX(), (int)(y+speed))) {
-			y+=speed;
-		} else if((int)y > Game.player.getY() && World.isFree(this.getX(), (int)(y-speed))
-				&& !isColidding(this.getX(), (int)(y-speed))) {
-			y-=speed;
+		if(!isColiddingWithPlayer()) {
+			if(frames >= maxFrames/2) Game.player.isTakeDamage = false;
+			
+			if((int)x < Game.player.getX() && World.isFree((int)(x+speed), this.getY())
+					&& !isColidding((int)(x+speed), this.getY())) {
+				x+=speed;
+			} else if((int)x > Game.player.getX() && World.isFree((int)(x-speed), this.getY())
+					&& !isColidding((int)(x-speed), this.getY())) {
+				x-=speed;
+			}
+			if((int)y < Game.player.getY() && World.isFree(this.getX(), (int)(y+speed))
+					&& !isColidding(this.getX(), (int)(y+speed))) {
+				y+=speed;
+			} else if((int)y > Game.player.getY() && World.isFree(this.getX(), (int)(y-speed))
+					&& !isColidding(this.getX(), (int)(y-speed))) {
+				y-=speed;
+			}
+		} else {
+			Game.player.takeDamage();
 		}
 		
 		frames++;
@@ -47,6 +53,13 @@ public class Enemy extends Entity {
 			index++;
 			if(index > maxIndex) index = 0;
 		}
+	}
+	
+	public boolean isColiddingWithPlayer() {
+		Rectangle enemyCurrent = new Rectangle(this.getX() + maskx, this.getY() + masky, maskw, maskh);
+		Rectangle player = new Rectangle(Game.player.getX() + maskx, Game.player.getY() + masky, 16, 16);
+		
+		return enemyCurrent.intersects(player);
 	}
 	
 	public boolean isColidding(int xnext, int ynext) {

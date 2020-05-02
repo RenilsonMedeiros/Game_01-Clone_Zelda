@@ -18,6 +18,11 @@ public class Player extends Entity {
 	private boolean moved = false;
 	private BufferedImage[] rightPlayer;
 	private BufferedImage[] leftPlayer;
+	private BufferedImage spriteDamage;
+	
+	public int life = 100;
+	public boolean isTakeDamage = false;
+	public int frameDamage = 0;
 
 	public Player(int x, int y, int width, int height, BufferedImage sprite) {
 		super(x, y, width, height, sprite);
@@ -68,12 +73,26 @@ public class Player extends Entity {
 	}
 	
 	
+	 public void takeDamage() {
+	 	if(Game.rand.nextInt(100) < 10) {
+	 		life-=Game.rand.nextInt(3);
+	 		System.out.println("life: " + life);
+	 		isTakeDamage = true;
+	 		spriteDamage = Game.spritesheet.getSprite(0, 16, 16, 16);
+	 		if(life <= 0) {
+	 			//Game Over!
+	 		}
+	 	} 
+	 }
+	
 	public void render(Graphics g) {
 		if(dir == right_dir) {
 			g.drawImage(rightPlayer[index], this.getX() - Camera.x, this.getY() - Camera.y, null);
 		} else if (dir == left_dir) {
 			g.drawImage(leftPlayer[index], this.getX() - Camera.x, this.getY() - Camera.y, null);
 		}
+		
+		if(isTakeDamage) g.drawImage(spriteDamage,this.getX() - Camera.x, this.getY() - Camera.y, null);
 	}
 
 }
