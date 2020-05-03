@@ -40,7 +40,10 @@ public class World {
 						Game.player.setY(yy*16);
 					} else if(pixelAtual == 0xFFFF0000) {
 						//Enemy
-						Enemy en = new Enemy(xx*16, yy*16, 16, 16, Entity.ENEMY_EN);
+						BufferedImage[] buf = new BufferedImage[2];
+						buf[0] = Game.spritesheet.getSprite(112, 16, 16, 16);
+						buf[1] = Game.spritesheet.getSprite(128, 16, 16, 16);
+						Enemy en = new Enemy(xx*16, yy*16, 16, 16, buf);
 						Game.entities.add(en);
 						Game.enemies.add(en);
 					} else if(pixelAtual == 0xFFFF6A00) {
@@ -48,7 +51,9 @@ public class World {
 						Game.entities.add(new Weapon(xx*16, yy*16, 16, 16, Entity.WEAPON_EN));
 					} else if(pixelAtual == 0xFFFFB27F) {
 						//Life Pack
-						Game.entities.add(new Lifepack(xx*16, yy*16, 16, 16, Entity.LIFEPACK_EN));
+						Lifepack lifepack = new Lifepack(xx*16, yy*16, 16, 16, Entity.LIFEPACK_EN);
+						lifepack.setMask(4, 5, 8, 8);
+						Game.entities.add(lifepack);
 					} else if(pixelAtual == 0xFFFFEC00) {
 						//Bullet
 						Game.entities.add(new Bullet(xx*16, yy*16, 16, 16, Entity.BULLET_EN));
