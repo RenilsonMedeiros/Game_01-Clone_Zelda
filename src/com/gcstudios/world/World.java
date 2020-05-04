@@ -12,6 +12,7 @@ import com.gcstudios.main.Game;
 public class World {
 	
 	public static Tile[] tiles; 
+	public static Entity[] entities; 
 	public static int WIDTH, HEIGHT;
 	public static final int TILE_SIZE = 16;
 
@@ -23,6 +24,7 @@ public class World {
 			WIDTH = map.getWidth();
 			HEIGHT = map.getHeight();
 			tiles = new Tile[map.getWidth() * map.getHeight()];
+			entities = new Entity[map.getWidth() * map.getHeight()];
 			map.getRGB(0, 0, map.getWidth(), map.getHeight(), pixels, 0, map.getWidth());
 			for(int xx = 0; xx < map.getWidth(); xx++) {
 				for(int yy = 0; yy < map.getHeight(); yy++) {
@@ -40,23 +42,41 @@ public class World {
 						Game.player.setY(yy*16);
 					} else if(pixelAtual == 0xFFFF0000) {
 						//Enemy
+<<<<<<< HEAD
 						BufferedImage[] buf = new BufferedImage[2];
 						buf[0] = Game.spritesheet.getSprite(112, 16, 16, 16);
 						buf[1] = Game.spritesheet.getSprite(128, 16, 16, 16);
-						Enemy en = new Enemy(xx*16, yy*16, 16, 16, buf);
+						Enemy ene = new Enemy(xx*16, yy*16, 16, 16, buf);
+						Game.entities.add(ene);
+						Game.enemies.add(ene);
+						entities[xx + (yy * WIDTH)] = ene;
+=======
+						Enemy en = new Enemy(xx*16, yy*16, 16, 16, Entity.ENEMY_EN);
 						Game.entities.add(en);
 						Game.enemies.add(en);
+>>>>>>> parent of 555a0c9... CheckCode
 					} else if(pixelAtual == 0xFFFF6A00) {
 						//Weapon
-						Game.entities.add(new Weapon(xx*16, yy*16, 16, 16, Entity.WEAPON_EN));
+						Weapon wea = new Weapon(xx*16, yy*16, 16, 16, Entity.WEAPON_EN);
+						Game.entities.add(wea);
+						entities[xx + (yy * WIDTH)] = wea;
 					} else if(pixelAtual == 0xFFFFB27F) {
 						//Life Pack
+<<<<<<< HEAD
 						Lifepack lifepack = new Lifepack(xx*16, yy*16, 16, 16, Entity.LIFEPACK_EN);
 						lifepack.setMask(4, 5, 8, 8);
 						Game.entities.add(lifepack);
+						entities[xx + (yy * WIDTH)] = lifepack;
+=======
+						Game.entities.add(new Lifepack(xx*16, yy*16, 16, 16, Entity.LIFEPACK_EN));
+>>>>>>> parent of 555a0c9... CheckCode
 					} else if(pixelAtual == 0xFFFFEC00) {
 						//Bullet
-						Game.entities.add(new Bullet(xx*16, yy*16, 16, 16, Entity.BULLET_EN));
+						Bullet bul = new Bullet(xx*16, yy*16, 16, 16, Entity.BULLET_EN);
+						Game.entities.add(bul);
+						//System.out.print(bul);
+						entities[xx + (yy * WIDTH)] = bul;
+					
 					} else {
 						//Floor
 						tiles[xx + (yy * WIDTH)] = new FloorTile(xx*16, yy*16, Tile.TILE_FLOOR);
@@ -98,6 +118,12 @@ public class World {
 			for(int yy = ystart; yy <= yfinal; yy++) {
 				if(xx < 0 || yy < 0 || xx >= WIDTH || yy >= HEIGHT) continue; //Não renderiza nada.
 				Tile tile = tiles[xx + (yy*WIDTH)];
+				Entity en = entities[xx + (yy*WIDTH)];
+				Game.player.render(g);
+				for(int i = 0; i < Game.entities.size(); i++) {
+					Entity e = Game.entities.get(i);
+					e.render(g);
+				}
 				tile.render(g);
 			}
 		}

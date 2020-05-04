@@ -3,7 +3,6 @@ package com.gcstudios.main;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -19,7 +18,6 @@ import com.gcstudios.entities.Enemy;
 import com.gcstudios.entities.Entity;
 import com.gcstudios.entities.Player;
 import com.gcstudios.graficos.Spritesheet;
-import com.gcstudios.graficos.UI;
 import com.gcstudios.world.World;
 
 public class Game extends Canvas implements Runnable, KeyListener {
@@ -43,8 +41,6 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	public static Player player;
 	
 	public static Random rand;
-	
-	public static UI ui;
 
 	public Game() {
 		rand = new Random();
@@ -53,7 +49,6 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		initFrame();
 		
 		//Inicializando objetos.
-		ui = new UI();
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		entities = new ArrayList<Entity>();
 		enemies = new ArrayList<Enemy>();
@@ -61,6 +56,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		player = new Player(0, 0, 16, 16, spritesheet.getSprite(32, 0, 16, 16));		
 		entities.add(player);
 		world = new World("/map.png");
+		
 	}
 
 	private void initFrame() {
@@ -113,20 +109,28 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		/* Renderização do jogo */
 		//Graphics2D g2 = (Graphics2D) g;
 		world.render(g);
-		
+		/*
 		for(int i = 0; i < entities.size(); i++) {
 			Entity e = entities.get(i);
 			e.render(g);
 		}
-		
+<<<<<<< HEAD
+		*/
 		ui.render(g);
+=======
+>>>>>>> parent of 555a0c9... CheckCode
 		
 		g.dispose();
 		g = bs.getDrawGraphics();
+		
 		g.drawImage(image, 0, 0, WIDTH*SCALE, HEIGHT*SCALE, null);
+<<<<<<< HEAD
 		g.setFont(new Font("arial", Font.BOLD, 20));
 		g.setColor(Color.WHITE);
 		g.drawString("Munição: " + player.ammo, 600, 25);
+		
+=======
+>>>>>>> parent of 555a0c9... CheckCode
 		bs.show();
 	}
 
