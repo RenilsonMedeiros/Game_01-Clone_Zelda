@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import com.gcstudios.main.Game;
+import com.gcstudios.main.Sound;
 import com.gcstudios.world.Camera;
 import com.gcstudios.world.FloorTile;
 import com.gcstudios.world.Tile;
@@ -37,10 +38,10 @@ public class BulletShoot extends Entity {
 					tile.life--;
 					for(int i = 0; i < World.tiles.length; i++) {
 						if(World.tiles[i] == tile && tile instanceof WallTile) {
-							if(tile.life == 15) World.tiles[i].setSprite(tile.getWallDamaged()[0]);
-							if(tile.life == 10) World.tiles[i].setSprite(tile.getWallDamaged()[1]);
-							if(tile.life == 5) World.tiles[i].setSprite(tile.getWallDamaged()[2]);
-							if(tile.life == 0) World.tiles[i] = new FloorTile(tile.getX(), tile.getY(), Tile.TILE_FLOOR_DAMAGE);
+							if(tile.life == 15) { World.tiles[i].setSprite(tile.getWallDamaged()[0]); Sound.wallWrecked.play(); }
+							if(tile.life == 10) { World.tiles[i].setSprite(tile.getWallDamaged()[1]); Sound.wallWrecked.play(); }
+							if(tile.life == 5) { World.tiles[i].setSprite(tile.getWallDamaged()[2]); Sound.wallWrecked.play(); }
+							if(tile.life == 0) { World.tiles[i] = new FloorTile(tile.getX(), tile.getY(), Tile.TILE_FLOOR_DAMAGE); Sound.wallWrecked.play(); }
 						}
 					}
 				}

@@ -9,8 +9,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.gcstudios.world.World;
-
 public class Menu {
 	
 	//Carregando as Images
@@ -44,15 +42,19 @@ public class Menu {
 	}
 
 	public void tick() {
+		
+		
 		if(this.up) {
 			this.up = false;
 			this.currentOption--;
+			Sound.select.play();
 			if(this.currentOption < 0) this.currentOption = this.maxOption;
 		}
 		
 		if(this.down) {
 			this.down = false;
 			this.currentOption++;
+			Sound.select.play();
 			if(this.currentOption > this.maxOption) this.currentOption = 0;
 		}
 		
@@ -60,6 +62,8 @@ public class Menu {
 			this.enter = false;
 			if(this.options[this.currentOption] == "novo jogo" /*|| this.options[this.currentOption]  == "continuar"*/) {
 				Game.gameState = "NORMAL";
+				if(!this.pause) Sound.begin.play();
+				else Sound.select.play();
 				this.pause = false;
 				
 			} else if(this.options[this.currentOption] == "carregar jogo"); // CARREGAR JOGO

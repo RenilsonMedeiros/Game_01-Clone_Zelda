@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -34,7 +33,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	public static JFrame frame;
 	private Thread thread;
 	private Boolean isRunning = true;
-	
+	private int i = 0;
 	protected int CUR_LEVEL = 1;
 	protected int MAX_LEVEL = 3;
 			
@@ -63,7 +62,6 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	public Menu menu;
 
 	public Game() {
-		Sound.musicBackground.loop();
 		rand = new Random();
 		addKeyListener(this);
 		addMouseListener(this);
@@ -114,6 +112,9 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	}
 	
 	public void tick() {
+		if(gameState != "GAME_OVER" && !menu.pause) { Sound.gameOverMusic.stop(); Sound.background.loop(); }
+		else Sound.background.stop(); 
+		
 		player.updateCamera();
 		
 		if(gameState == "NORMAL") {
@@ -138,6 +139,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 				World.restartGame(newWorld);
 			}
 		} else if(gameState == "GAME_OVER") {
+			Sound.gameOverMusic.loop();
 			this.framesGameOver++;
 			if(this.framesGameOver == 30) {
 				this.framesGameOver = 0;
@@ -148,6 +150,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 			if(restartGame) {
 				this.restartGame = false;
 				gameState = "NORMAL";
+				Sound.begin.play();
 				
 				this.CUR_LEVEL = 1;
 				String newWorld = "level"+CUR_LEVEL+".png";

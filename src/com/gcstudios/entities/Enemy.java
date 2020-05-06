@@ -79,7 +79,7 @@ public class Enemy extends Entity {
 	
 	public void takeDamage() {
 	 		life--;
-	 		Sound.musicHurt.play();
+	 		Sound.hurt.play();
 	 		isTakeDamage = true;
 	 		spriteDamage = Entity.ENEMY_DAMAGE;
 	 		if(life <= 0) {

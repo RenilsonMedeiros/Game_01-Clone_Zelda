@@ -3,6 +3,7 @@ package com.gcstudios.entities;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import com.gcstudios.main.Game;
+import com.gcstudios.main.Sound;
 import com.gcstudios.world.Camera;
 import com.gcstudios.world.World;
 
@@ -81,6 +82,7 @@ public class Player extends Entity {
 			shoot = false;
 			if(hasGun && ammo > 0) {
 				ammo--;
+				Sound.shoot.play();
 				// Criar Bala e atirar!
 				int dx = 0; int px = 0; int py = 6;
 				if(dir == right_dir) {
@@ -99,6 +101,7 @@ public class Player extends Entity {
 			mouseShoot = false;
 			if(hasGun && ammo > 0) {
 				ammo--;
+				Sound.shoot.play();
 				// Criar Bala e atirar!
 				int px = 0, py = 8; double angle = 0;
 				if(dir == right_dir) {
@@ -120,6 +123,7 @@ public class Player extends Entity {
 		
 		if(life <= 0) {
 			//GAME OVER
+			Sound.gameOver.play();
 			life = 0;
 			Game.gameState = "GAME_OVER";
 		}
@@ -139,6 +143,7 @@ public class Player extends Entity {
 			if(atual instanceof Weapon) {
 				if(Entity.isColliding(this, atual)) {
 					hasGun = true;
+					Sound.pickup.play();
 					Game.entities.remove(atual);
 				}
 			}
@@ -151,6 +156,7 @@ public class Player extends Entity {
 			if(atual instanceof Bullet) {
 				if(Entity.isColliding(this, atual)) {
 					ammo+=30;
+					Sound.pickup.play();
 					Game.entities.remove(atual);
 				}
 			}
@@ -163,6 +169,7 @@ public class Player extends Entity {
 			if(atual instanceof Lifepack) {
 				if(Entity.isColliding(this, atual)) {
 					life+=10;
+					Sound.pickup.play();
 					if(life >= maxLife) life = maxLife;
 					Game.entities.remove(i);
 				}
@@ -173,6 +180,7 @@ public class Player extends Entity {
 	 public void takeDamage() {
 	 	if(Game.rand.nextInt(100) < 10) {
 	 		life-=Game.rand.nextInt(3);
+	 		Sound.hurtPlayer.play();
 	 		isTakeDamage = true;
 	 		spriteDamage = Entity.PLAYER_DAMAGE;
 	 		if(life <= 0) {
