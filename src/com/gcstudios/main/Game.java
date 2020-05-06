@@ -28,14 +28,15 @@ import com.gcstudios.world.World;
 public class Game extends Canvas implements Runnable, KeyListener, MouseListener {
 
 	private static final long serialVersionUID = 1L;
-	public static JFrame frame;
-	private Thread thread;
-	private Boolean isRunning = true;
 	public static final int WIDTH = 240;
 	public static final int HEIGHT = 160;
 	public static final int SCALE = 3;
+	public static JFrame frame;
+	private Thread thread;
+	private Boolean isRunning = true;
 	
-	private int CUR_LEVEL = 1, MAX_LEVEL = 3;
+	protected int CUR_LEVEL = 1;
+	protected int MAX_LEVEL = 3;
 			
 	private BufferedImage image;
 	
@@ -48,16 +49,21 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	
 	public static Player player;
 	
+	//public static Sound sound;
+	
 	public static Random rand;
 	
 	public static UI ui;
 	
-	public static String gameState = "NORMAL";
+	public static String gameState = "MENU";
 	private boolean showMessageGameOver = true;
 	private int framesGameOver = 0;
 	private boolean restartGame = false;
+	
+	public Menu menu;
 
 	public Game() {
+		Sound.musicBackground.loop();
 		rand = new Random();
 		addKeyListener(this);
 		addMouseListener(this);
@@ -73,6 +79,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 		spritesheet = new Spritesheet("/spritesheet.png");
 		player = new Player(0, 0, 16, 16, spritesheet.getSprite(32, 0, 16, 16));		
 		world = new World("/level1.png");
+		menu = new Menu();
 		entities.add(player);
 	}
 
@@ -107,6 +114,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	}
 	
 	public void tick() {
+		player.updateCamera();
+		
 		if(gameState == "NORMAL") {
 			this.restartGame = false;
 			for(int i = 0; i < entities.size(); i++) {
@@ -144,6 +153,9 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 				String newWorld = "level"+CUR_LEVEL+".png";
 				World.restartGame(newWorld);
 			}
+		} else if(gameState == "MENU") {
+			//Menu do meu jogo
+			menu.tick();
 		}
 		
 		
@@ -183,7 +195,6 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 		g.drawString("Munição: " + player.ammo, 600, 25);
 		
 		if(gameState == "GAME_OVER") {
-			Graphics2D g2 = (Graphics2D) g;
 			g.setColor(new Color(0,0,0,100));
 			g.fillRect(0, 0, WIDTH*SCALE, HEIGHT*SCALE);
 			g.setFont(new Font("arial", Font.BOLD, 36));
@@ -191,6 +202,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 			g.drawString("Game Over", WIDTH*SCALE/2-100, HEIGHT*SCALE/2);
 			if(showMessageGameOver)
 				g.drawString(">Pressione Enter para reniciar<", WIDTH*SCALE/2-260, HEIGHT*SCALE/2+60);
+		} else if(gameState == "MENU") {
+			menu.render(g);
 		}
 		
 		bs.show();
@@ -256,12 +269,16 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 			e.getKeyCode() == KeyEvent.VK_W
 		) {
 			player.up = true;
+			
+			if(gameState == "MENU") menu.up = true;
 		} else if
 			(
 				e.getKeyCode() == KeyEvent.VK_DOWN ||
 				e.getKeyCode() == KeyEvent.VK_S
 			) {
 				player.down = true;
+				
+				if(gameState == "MENU") menu.down = true;
 		}
 	}
 
@@ -293,11 +310,20 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 				e.getKeyCode() == KeyEvent.VK_S
 			) {
 				player.down = false;
-		}
+			}
 		
 		if(e.getKeyCode() == KeyEvent.VK_SPACE) player.shoot = true;
 		
-		if(e.getKeyCode() == KeyEvent.VK_ENTER) this.restartGame = true;
+		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+			this.restartGame = true;
+			if(gameState == "MENU") menu.enter = true;
+		}
+		
+		if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			gameState = "MENU";
+			menu.pause = true;
+		}
+		
 	}
 
 	@Override
@@ -309,8 +335,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	@Override
 	public void mousePressed(MouseEvent e) {
 		player.mouseShoot = true;
-		player.mx = e.getX() / this.SCALE;
-		player.my = e.getY() / this.SCALE;
+		player.mx = e.getX() / SCALE;
+		player.my = e.getY() / SCALE;
 		
 	}
 

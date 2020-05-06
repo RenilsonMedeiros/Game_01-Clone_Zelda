@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import com.gcstudios.main.Game;
+import com.gcstudios.main.Sound;
 import com.gcstudios.world.Camera;
 import com.gcstudios.world.World;
 
@@ -78,6 +79,7 @@ public class Enemy extends Entity {
 	
 	public void takeDamage() {
 	 		life--;
+	 		Sound.musicHurt.play();
 	 		isTakeDamage = true;
 	 		spriteDamage = Entity.ENEMY_DAMAGE;
 	 		if(life <= 0) {

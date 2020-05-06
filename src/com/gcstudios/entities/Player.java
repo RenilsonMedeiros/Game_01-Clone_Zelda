@@ -10,7 +10,7 @@ public class Player extends Entity {
 	
 	public boolean right, up, left, down;
 	public int right_dir = 0, left_dir = 1;
-	public int dir = right_dir;             //Por padrão.
+	public int dir = right_dir;             //Default.
 	public double speed = 1;
 	
 	private int frames = 0, maxFrames = 4, index = 0, maxIndex = 4;
@@ -123,10 +123,14 @@ public class Player extends Entity {
 			life = 0;
 			Game.gameState = "GAME_OVER";
 		}
-		
+
+		this.updateCamera();
+
+	}
+	
+	public void updateCamera() {
 		Camera.x = Camera.clamp(this.getX() - (Game.WIDTH/2), 0, World.WIDTH*16 - Game.WIDTH);
 		Camera.y = Camera.clamp(this.getY() - (Game.HEIGHT/2), 0, World.HEIGHT*16 - Game.HEIGHT);
-
 	}
 	
 	public void checkCollisionGun() {
