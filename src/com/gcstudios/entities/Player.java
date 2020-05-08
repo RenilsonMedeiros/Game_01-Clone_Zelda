@@ -1,5 +1,6 @@
 package com.gcstudios.entities;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import com.gcstudios.main.Game;
@@ -18,6 +19,12 @@ public class Player extends Entity {
 	private boolean moved = false;
 	private BufferedImage[] rightPlayer;
 	private BufferedImage[] leftPlayer;
+	
+	public boolean jump, isJumping;
+	private boolean jumpUp, jumpDown;
+	private double jumpCur = 0, jumpSpd = 2, maxSpd = jumpSpd;
+	private double g = 0.08;
+	private int opacityShadow = 200;
 	
 	private boolean hasGun;
 	
@@ -47,20 +54,20 @@ public class Player extends Entity {
 	
 	public void tick() {
 		moved = false;
-		if(right && World.isFree((int)(x+speed), this.getY())) {
+		if(right && World.isFree((int)(x+speed), this.getY(), this.getZ())) {
 			moved = true;
 			dir = right_dir;
 			x+=speed; 
-		} else if(left && World.isFree((int)(x-speed), this.getY())) {
+		} else if(left && World.isFree((int)(x-speed), this.getY(), this.getZ())) {
 			moved = true;
 			dir = left_dir;
 			x-=speed;
 		}
-		if(up && World.isFree(this.getX(), (int)(y-speed))) {
+		if(up && World.isFree(this.getX(), (int)(y-speed), this.getZ())) {
 			moved = true;
 			y-=speed;
 		}
-		else if(down && World.isFree(this.getX(), (int)(y+speed))) {
+		else if(down && World.isFree(this.getX(), (int)(y+speed), this.getZ())) {
 			moved = true;
 			y+=speed;
 		}
@@ -121,6 +128,10 @@ public class Player extends Entity {
 			}
 		}
 		
+		if(jump) {
+			this.toJump();
+		}
+		
 		if(life <= 0) {
 			//GAME OVER
 			Sound.gameOver.play();
@@ -135,6 +146,39 @@ public class Player extends Entity {
 	public void updateCamera() {
 		Camera.x = Camera.clamp(this.getX() - (Game.WIDTH/2), 0, World.WIDTH*16 - Game.WIDTH);
 		Camera.y = Camera.clamp(this.getY() - (Game.HEIGHT/2), 0, World.HEIGHT*16 - Game.HEIGHT);
+	}
+	
+	public void toJump() {
+			if(!isJumping) {
+				jump = false;
+				isJumping = true;
+				jumpUp = true;
+				Sound.jumpPlayer.play();
+			}
+			
+			if(isJumping) {
+				if(jumpUp) {
+					jumpSpd-=g;
+					jumpCur+=jumpSpd;
+					jump = true;
+				} else if(jumpDown) {
+					jumpSpd+=g;
+					jumpCur-=jumpSpd;
+					if(jumpSpd >= maxSpd) {
+						z = 0; jumpCur = 0; jumpSpd = maxSpd;
+						isJumping = false;
+						jumpDown = false;
+						jump = false;
+					}
+				}
+				
+				z = (int)jumpCur;
+			}
+			
+			if(jumpSpd <= 0) {
+				jumpDown = true;
+				jumpUp = false;
+			} 
 	}
 	
 	public void checkCollisionGun() {
@@ -192,23 +236,46 @@ public class Player extends Entity {
 	public void render(Graphics g) {
 		if(!isTakeDamage) {	
 			if(moved && dir == right_dir) {
-				g.drawImage(rightPlayer[index], this.getX() - Camera.x, this.getY() - Camera.y, null);
-				if(hasGun) g.drawImage(Entity.GUN_RIGHT, this.getX()+8 - Camera.x, this.getY() - Camera.y, null); 
+				g.drawImage(rightPlayer[index], this.getX() - Camera.x, this.getY() - Camera.y - z, null);
+				if(hasGun) g.drawImage(Entity.GUN_RIGHT, this.getX()+8 - Camera.x, this.getY() - Camera.y - z, null); 
 				
 			} else if (moved && dir == left_dir) {
-				g.drawImage(leftPlayer[index], this.getX() - Camera.x, this.getY() - Camera.y, null);
-				if(hasGun) g.drawImage(Entity.GUN_LEFT, this.getX()-8 - Camera.x, this.getY() - Camera.y, null); 
+				g.drawImage(leftPlayer[index], this.getX() - Camera.x, this.getY() - Camera.y - z, null);
+				if(hasGun) g.drawImage(Entity.GUN_LEFT, this.getX()-8 - Camera.x, this.getY() - Camera.y - z, null); 
 				
 			} else if(dir == right_dir) {
-				g.drawImage(rightPlayer[0], this.getX() - Camera.x, this.getY() - Camera.y, null);
-				if(hasGun) g.drawImage(Entity.GUN_RIGHT, this.getX()+8 - Camera.x, this.getY() - Camera.y, null); 
+				g.drawImage(rightPlayer[0], this.getX() - Camera.x, this.getY() - Camera.y - z, null);
+				if(hasGun) g.drawImage(Entity.GUN_RIGHT, this.getX()+8 - Camera.x, this.getY() - Camera.y - z, null); 
 				
 			} else if(dir == left_dir) {
-				g.drawImage(leftPlayer[3], this.getX() - Camera.x, this.getY() - Camera.y, null);
-				if(hasGun) g.drawImage(Entity.GUN_LEFT, this.getX()-8 - Camera.x, this.getY() - Camera.y, null); 
+				g.drawImage(leftPlayer[3], this.getX() - Camera.x, this.getY() - Camera.y - z, null);
+				if(hasGun) g.drawImage(Entity.GUN_LEFT, this.getX()-8 - Camera.x, this.getY() - Camera.y - z, null); 
 			}
 			
-		} else g.drawImage(spriteDamage,this.getX() - Camera.x, this.getY() - Camera.y, null);
+		} else g.drawImage(spriteDamage,this.getX() - Camera.x, this.getY() - Camera.y - z, null);
+		
+		if(isJumping) {
+			if(jumpUp) g.setColor(new Color(0,0,0, opacityShadow-=2));
+			else g.setColor(new Color(0,0,0, opacityShadow+=2));
+			g.fillOval(this.getX() - Camera.x +3, this.getY() - Camera.y +10, 10, 10);
+		} else opacityShadow = 200;
+		
+		/*
+		if(isJumping) {
+			if(jumpUp) {
+				g.setColor(new Color(0,0,0,opacityShadow--));
+				g.fillOval(this.getX() - Camera.x +3 -this.sizeShadow++, this.getY() - Camera.y +10 -this.sizeShadow++, this.sizeShadow++, this.sizeShadow++);
+			}
+			else if(jumpDown) {
+				g.setColor(new Color(0,0,0,opacityShadow++));
+				g.fillOval(this.getX() - Camera.x +3 +this.sizeShadow++, this.getY() - Camera.y +this.sizeShadow--, this.sizeShadow--, this.sizeShadow--);
+			}
+			
+		} else {
+			this.opacityShadow = 100;
+			this.sizeShadow = 8;
+		}
+		*/
 	}
 
 }

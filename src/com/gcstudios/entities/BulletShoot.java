@@ -31,8 +31,8 @@ public class BulletShoot extends Entity {
 		y+=dy*spd;
 		
 		curLife++;
-		if(curLife == life || !World.isFree((int)x-6, (int)y-6)) {
-			if(!World.isFree((int)x-6, (int)y-6)) {
+		if(curLife == life || !World.isFree((int)x-6, (int)y-6, this.getZ())) {
+			if(!World.isFree((int)x-6, (int)y-6, this.getZ())) {
 				Tile tile = Tile.getTileColliding((int)x-6, (int)y-6);
 				if(tile != null) {
 					tile.life--;

@@ -33,7 +33,6 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	public static JFrame frame;
 	private Thread thread;
 	private Boolean isRunning = true;
-	private int i = 0;
 	protected int CUR_LEVEL = 1;
 	protected int MAX_LEVEL = 3;
 			
@@ -47,6 +46,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	public static World world;
 	
 	public static Player player;
+	
+	public static Entity entity;
 	
 	//public static Sound sound;
 	
@@ -160,7 +161,6 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 			//Menu do meu jogo
 			menu.tick();
 		}
-		
 		
 	}
 	
@@ -283,6 +283,20 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 				
 				if(gameState == "MENU") menu.down = true;
 		}
+		
+		if(e.getKeyCode() == KeyEvent.VK_Z) player.jump = true;
+		
+		if(e.getKeyCode() == KeyEvent.VK_SPACE) player.shoot = true;
+		
+		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+			this.restartGame = true;
+			if(gameState == "MENU") menu.enter = true;
+		}
+		
+		if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			gameState = "MENU";
+			menu.pause = true;
+		}
 	}
 
 	@Override
@@ -314,18 +328,6 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 			) {
 				player.down = false;
 			}
-		
-		if(e.getKeyCode() == KeyEvent.VK_SPACE) player.shoot = true;
-		
-		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			this.restartGame = true;
-			if(gameState == "MENU") menu.enter = true;
-		}
-		
-		if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-			gameState = "MENU";
-			menu.pause = true;
-		}
 		
 	}
 

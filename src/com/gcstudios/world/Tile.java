@@ -43,12 +43,6 @@ public class Tile {
 		else if(World.tiles[x3 + (y3*World.WIDTH)] instanceof WallTile) return  World.tiles[x3 + y3*World.WIDTH];
 		else if(World.tiles[x4 + (y4*World.WIDTH)] instanceof WallTile) return  World.tiles[x4 + y4*World.WIDTH];
 		else return null;
-		
-		/*return !() ||
-				(tiles[x2 + (y2*World.WIDTH)] instanceof WallTile) ||
-				(tiles[x3 + (y3*World.WIDTH)] instanceof WallTile) ||
-				(tiles[x4 + (y4*World.WIDTH)] instanceof WallTile));
-		*/
 	}
 	
 	public BufferedImage[] getWallDamaged() {

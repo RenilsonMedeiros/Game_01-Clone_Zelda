@@ -47,6 +47,7 @@ public class Sound {
 	public static final Clips background = load("/zelda1.wav", 1);
 	public static final Clips hurt = load("/hurt.wav", 1);
 	public static final Clips hurtPlayer = load("/hurtplayer.wav", 1);
+	public static final Clips jumpPlayer = load("/jumpplayer.wav", 1);
 	public static final Clips shoot = load("/shoot.wav", 1);
 	public static final Clips pickup = load("/pickup.wav", 1);
 	public static final Clips wallWrecked = load("/wallwrecked.wav", 1);
