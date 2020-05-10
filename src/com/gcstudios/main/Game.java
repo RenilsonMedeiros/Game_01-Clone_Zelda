@@ -17,10 +17,7 @@ import java.util.Random;
 
 import javax.swing.JFrame;
 
-import com.gcstudios.entities.BulletShoot;
-import com.gcstudios.entities.Enemy;
-import com.gcstudios.entities.Entity;
-import com.gcstudios.entities.Player;
+import com.gcstudios.entities.*;
 import com.gcstudios.graficos.*;
 import com.gcstudios.world.World;
 
@@ -33,8 +30,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	public static JFrame frame;
 	private Thread thread;
 	private Boolean isRunning = true;
-	protected int CUR_LEVEL = 1;
-	protected int MAX_LEVEL = 3;
+	public static int CUR_LEVEL = 1;
+	public static int MAX_LEVEL = 3;
 			
 	private BufferedImage image;
 	
@@ -61,6 +58,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	private boolean restartGame = false;
 	
 	public Menu menu;
+	
+	public boolean saveGame;
 
 	public Game() {
 		rand = new Random();
@@ -113,12 +112,33 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	}
 	
 	public void tick() {
-		if(gameState != "GAME_OVER" && !menu.pause) { Sound.gameOverMusic.stop(); Sound.background.loop(); }
+		if(gameState != "GAME_OVER" && !Menu.pause) { Sound.gameOverMusic.stop(); Sound.background.loop(); }
 		else Sound.background.stop(); 
 		
 		player.updateCamera();
 		
 		if(gameState == "NORMAL") {
+			if(this.saveGame) {
+				this.saveGame = false;
+				
+				String[] keys = {
+					"level", 
+					"life", 
+					"ammo",
+					"lifepack", 
+				};
+				
+				int[] values = {
+					CUR_LEVEL, 
+					(int)player.life, 
+					player.ammo,
+					this.getLifepackNum(), 
+				};
+				
+				Menu.saveGame(keys, values, 45);
+				System.out.println("Jogo foi salvo");
+			}
+			
 			this.restartGame = false;
 			for(int i = 0; i < entities.size(); i++) {
 				Entity e = entities.get(i);
@@ -132,11 +152,13 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 			
 			if(enemies.size() == 0) {
 				//Avançar para o próximo level!
-				this.CUR_LEVEL++;
-				System.out.println(this.CUR_LEVEL);
-				if(this.CUR_LEVEL > this.MAX_LEVEL) this.CUR_LEVEL = 1;
-				String newWorld = "level" + this.CUR_LEVEL + ".png";
-				System.out.println(newWorld);
+				CUR_LEVEL++;
+				if(CUR_LEVEL > MAX_LEVEL) {
+					System.out.println("entrei");
+					CUR_LEVEL = 1;
+				}
+				String newWorld = "level" + CUR_LEVEL + ".png";
+				System.out.println("Nível: "+newWorld);
 				World.restartGame(newWorld);
 			}
 		} else if(gameState == "GAME_OVER") {
@@ -148,13 +170,15 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 				else this.showMessageGameOver = true;
 			}
 			
+			//Apertei ENTER
 			if(restartGame) {
 				this.restartGame = false;
 				gameState = "NORMAL";
 				Sound.begin.play();
 				
-				this.CUR_LEVEL = 1;
+				CUR_LEVEL = 1;
 				String newWorld = "level"+CUR_LEVEL+".png";
+				System.out.println("será");
 				World.restartGame(newWorld);
 			}
 		} else if(gameState == "MENU") {
@@ -162,6 +186,16 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 			menu.tick();
 		}
 		
+	}
+	
+	public int getLifepackNum() {
+		int lifepackNum = 0;
+		for(Entity entity : entities) {
+			if(entity instanceof Lifepack) lifepackNum++;
+		}
+		System.out.println("lifepack: "+lifepackNum);
+		System.out.println("total: "+world.totalLifepack);
+		return world.totalLifepack - lifepackNum;
 	}
 	
 	public void render() {
@@ -187,6 +221,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 			BulletShoot b = bullets.get(i);
 			b.render(g);
 		}
+		
+		player.render(g);
 		
 		ui.render(g);
 		
@@ -295,7 +331,11 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 		
 		if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			gameState = "MENU";
-			menu.pause = true;
+			Menu.pause = true;
+		}
+		
+		if(e.getKeyCode() == KeyEvent.VK_M) {
+			this.saveGame = true;
 		}
 	}
 

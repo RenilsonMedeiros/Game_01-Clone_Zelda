@@ -38,11 +38,13 @@ public class Tile {
 		int x4 = (xnext+TILE_SIZE-1) / TILE_SIZE;
 		int y4 = (ynext+TILE_SIZE-1) / TILE_SIZE;
 		
-		if(World.tiles[x1 + (y1*World.WIDTH)] instanceof WallTile) return  World.tiles[x1 + y1*World.WIDTH];
-		else if(World.tiles[x2 + (y2*World.WIDTH)] instanceof WallTile) return  World.tiles[x2 + y2*World.WIDTH];
-		else if(World.tiles[x3 + (y3*World.WIDTH)] instanceof WallTile) return  World.tiles[x3 + y3*World.WIDTH];
-		else if(World.tiles[x4 + (y4*World.WIDTH)] instanceof WallTile) return  World.tiles[x4 + y4*World.WIDTH];
-		else return null;
+		try {
+			if(World.tiles[x1 + (y1*World.WIDTH)] instanceof WallTile) return  World.tiles[x1 + y1*World.WIDTH];
+			else if(World.tiles[x2 + (y2*World.WIDTH)] instanceof WallTile) return  World.tiles[x2 + y2*World.WIDTH];
+			else if(World.tiles[x3 + (y3*World.WIDTH)] instanceof WallTile) return  World.tiles[x3 + y3*World.WIDTH];
+			else if(World.tiles[x4 + (y4*World.WIDTH)] instanceof WallTile) return  World.tiles[x4 + y4*World.WIDTH];
+		} catch(ArrayIndexOutOfBoundsException e) {}
+		return null;
 	}
 	
 	public BufferedImage[] getWallDamaged() {

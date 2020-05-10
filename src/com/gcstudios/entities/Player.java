@@ -3,6 +3,7 @@ package com.gcstudios.entities;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+
 import com.gcstudios.main.Game;
 import com.gcstudios.main.Sound;
 import com.gcstudios.world.Camera;
@@ -200,6 +201,7 @@ public class Player extends Entity {
 			if(atual instanceof Bullet) {
 				if(Entity.isColliding(this, atual)) {
 					ammo+=30;
+					if(ammo >= 99) ammo = 99;
 					Sound.pickup.play();
 					Game.entities.remove(atual);
 				}
@@ -255,8 +257,10 @@ public class Player extends Entity {
 		} else g.drawImage(spriteDamage,this.getX() - Camera.x, this.getY() - Camera.y - z, null);
 		
 		if(isJumping) {
-			if(jumpUp) g.setColor(new Color(0,0,0, opacityShadow-=2));
-			else g.setColor(new Color(0,0,0, opacityShadow+=2));
+			try {
+				if(jumpUp) g.setColor(new Color(0,0,0, opacityShadow-=2));
+				else g.setColor(new Color(0,0,0, opacityShadow+=2));
+			} catch(IllegalArgumentException e) {}
 			g.fillOval(this.getX() - Camera.x +3, this.getY() - Camera.y +10, 10, 10);
 		} else opacityShadow = 200;
 		

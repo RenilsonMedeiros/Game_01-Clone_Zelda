@@ -16,6 +16,8 @@ public class World {
 	public static Tile[] tiles; 
 	public static int WIDTH, HEIGHT;
 	public static final int TILE_SIZE = 16;
+	
+	public int totalLifepack;
 
 	public World(String path) {
 		try {
@@ -56,6 +58,7 @@ public class World {
 						Lifepack lifepack = new Lifepack(xx*16, yy*16, 16, 16, Entity.LIFEPACK_EN);
 						lifepack.setMask(4, 5, 8, 8);
 						Game.entities.add(lifepack);
+						totalLifepack++;
 					} else if(pixelAtual == 0xFFFFEC00) {
 						//Bullet
 						Game.entities.add(new Bullet(xx*16, yy*16, 16, 16, Entity.BULLET_EN));
@@ -107,7 +110,6 @@ public class World {
 		Game.enemies = new ArrayList<Enemy>();
 		Game.spritesheet = new Spritesheet("/spritesheet.png");
 		Game.player = new Player(0, 0, 16, 16, Game.spritesheet.getSprite(32, 0, 16, 16));	
-		//Game.player.updateCamera();
 		Game.entities.add(Game.player);
 		Game.world = new World("/" + level);
 		return;

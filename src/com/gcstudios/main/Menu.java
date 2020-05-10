@@ -5,9 +5,18 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+
+import com.gcstudios.entities.*;
+import com.gcstudios.world.World;
 
 public class Menu {
 	
@@ -22,13 +31,17 @@ public class Menu {
 	private int frame = 0;
 	
 	public String[] options = {"novo jogo", "carregar jogo", "sair"};
-	
+	 
 	public int currentOption = 0;
 	public int maxOption = options.length - 1;
 	
 	public boolean up, down , enter;
 	
-	public boolean pause = false;
+	
+	public static boolean pause = false;
+	
+	public static boolean saveExists = false;
+	//public static boolean saveGame = false;
 	
 	public BufferedImage getImage(String path) {
 		BufferedImage imageMenu = null;
@@ -42,7 +55,12 @@ public class Menu {
 	}
 
 	public void tick() {
-		
+		File file = new File("save.txt");
+		if(file.exists()) {
+			saveExists = true;
+		} else {
+			saveExists = false;
+		}
 		
 		if(this.up) {
 			this.up = false;
@@ -62,14 +80,114 @@ public class Menu {
 			this.enter = false;
 			if(this.options[this.currentOption] == "novo jogo" /*|| this.options[this.currentOption]  == "continuar"*/) {
 				Game.gameState = "NORMAL";
-				if(!this.pause) Sound.begin.play();
+				if(!pause) Sound.begin.play();
 				else Sound.select.play();
-				this.pause = false;
-				
-			} else if(this.options[this.currentOption] == "carregar jogo"); // CARREGAR JOGO
+				pause = false;
+				file = new File("save.txt");
+				file.delete();
+			} else if(this.options[this.currentOption] == "carregar jogo") { // CARREGAR JOGO
+				file = new File("save.txt");
+				if(file.exists()) {
+					String saver = loadGame(45);
+					applyGame(saver);
+				}
+			}
 			
 			else System.exit(1);; //SAIR
 		}
+	}
+	
+	public static void applyGame(String str) {
+		String[] spl = str.split("/");
+		for(int i = 0; i < spl.length; i++) {
+			String[] spl2 = spl[i].split(":");
+			switch(spl2[0]) {
+				case "level":
+					Game.CUR_LEVEL = Integer.parseInt(spl2[1]);
+					World.restartGame("level"+spl2[1]+".png");
+					Game.gameState = "NORMAL";
+					pause = false;
+					break;
+					
+				case "life":
+					System.out.println("life");
+					Game.player.life = Integer.parseInt(spl2[1]);
+					break;
+					
+				case "ammo":
+					Game.player.ammo = Integer.parseInt(spl2[1]);
+					break;
+					
+				case "lifepack":
+					int gotLifepack = Integer.parseInt(spl2[1]);
+					int numRemovedL = 0;
+					System.out.println("entrei: " +gotLifepack);
+					for(int n = 0; n < Game.entities.size(); n++) {
+						if(Game.entities.get(n) instanceof Lifepack) {
+							if(numRemovedL >= gotLifepack) break;
+							Game.entities.remove(n);
+							numRemovedL++;
+						}
+						System.out.println("removed: "+numRemovedL);
+					}
+					break;
+			}
+		}
+	}
+	
+	public static String loadGame(int encode) {
+		String line = "";
+		File file = new File("save.txt");
+		if(file.exists()) {
+			try {
+				String singleLine = null;
+				BufferedReader reader = new BufferedReader(new FileReader("save.txt"));
+				
+				try {
+					while((singleLine = reader.readLine()) != null) {
+						String[] trans = singleLine.split(":");
+						char[] val = trans[1].toCharArray();
+						trans[1] = "";
+						for(int i = 0; i < val.length; i++) {
+							val[i]-=encode;
+							trans[1]+=val[i];
+						}
+						// chave:valor/  -> ex: life:36/
+						line+=trans[0]; line+=":"; line+=trans[1]; line+="/";
+					}
+				} catch (IOException e) {}
+			} catch (FileNotFoundException e) {}
+		}
+		
+		return line;
+	}
+	
+	public static void saveGame(String[] val1, int[] val2, int encode) {
+		BufferedWriter writer = null;
+		try {
+			writer = new BufferedWriter(new FileWriter("save.txt"));
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		for(int i = 0; i < val1.length; i++) {
+			String current = val1[i];
+			current+=":";
+			char[] value = Integer.toString(val2[i]).toCharArray();
+			for(int n = 0; n < value.length; n++) {
+				value[n]+=encode;
+				current+=value[n];
+			}
+			try {
+				writer.write(current);
+				if(i < val1.length - 1) writer.newLine();
+			} catch(IOException e) {}
+		}
+		
+		try {
+			writer.flush();
+			writer.close();
+		} catch(IOException e) {}
 	}
 	
 	public void render(Graphics g) {
@@ -87,7 +205,7 @@ public class Menu {
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("arial", Font.BOLD, 24));
 		
-		if(!this.pause) g.drawString("Novo Jogo", Game.WIDTH*Game.SCALE / 2 - 60, Game.HEIGHT*Game.SCALE / 2 - 80);
+		if(!pause) g.drawString("Novo Jogo", Game.WIDTH*Game.SCALE / 2 - 60, Game.HEIGHT*Game.SCALE / 2 - 80);
 		else g.drawString("Continuar", Game.WIDTH*Game.SCALE / 2 - 55, Game.HEIGHT*Game.SCALE / 2 - 80);
 		
 		g.drawString("Carregar Jogo", Game.WIDTH*Game.SCALE / 2 - 80, Game.HEIGHT*Game.SCALE / 2 - 40);
