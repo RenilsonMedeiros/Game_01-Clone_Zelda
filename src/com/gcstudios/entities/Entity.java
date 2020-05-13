@@ -3,9 +3,12 @@ package com.gcstudios.entities;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import com.gcstudios.main.Game;
 import com.gcstudios.world.Camera;
+import com.gcstudios.world.Node;
+import com.gcstudios.world.Vector2i;
 
 public class Entity {
 	
@@ -23,6 +26,8 @@ public class Entity {
 	protected int z;
 	protected int width;
 	protected int height;
+	
+	protected List<Node> path;
 	
 	private BufferedImage sprite;
 	
@@ -78,6 +83,22 @@ public class Entity {
 	
 	public void tick() {
 		
+	}
+	
+	public void followPath(List<Node> path) {
+		if(path != null) {
+			if(path.size() > 0) {
+				Vector2i target = path.get(path.size() - 1).tile;
+				
+				if(x < target.x * 16) x++;
+				else if(x > target.x * 16) x--;
+				
+				if(y < target.y * 16) y++;
+				else if(y> target.y * 16) y--;
+				
+				if(x == target.x * 16 && y == target.y * 16) path.remove(path.size() - 1);
+			}
+		}
 	}
 	
 	public static boolean isColliding(Entity e1, Entity e2) {

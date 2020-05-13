@@ -1,4 +1,0 @@
-level:_
-life:^]]
-ammo:dc
-lifepack:`
