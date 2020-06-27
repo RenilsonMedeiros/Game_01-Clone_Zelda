@@ -50,15 +50,13 @@ public class Enemy extends Entity {
 			}
 		} else Game.player.takeDamage();
 		*/
-		float timeInicial = System.currentTimeMillis();
 		if(path == null || path.size() == 0) {
 			Vector2i start = new Vector2i((int)(x/16), (int)(y/16));
 			Vector2i end = new Vector2i((int)(Game.player.x), (int)(Game.player.y));
 			path = AStar.findPath(Game.world, start, end);
 		}
 		followPath(path);
-		float timeFinal = System.currentTimeMillis();
-		System.out.println(timeFinal - timeInicial);
+
 		frames++;
 		if(frames == maxFrames) {
 			frames = 0;
